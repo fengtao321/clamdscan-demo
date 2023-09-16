@@ -1,58 +1,59 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const { writeFile } = require("fs/promises");
+const {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+} = require("@aws-sdk/client-s3");
+const fs = require("fs");
 
-async function uploadMultipleImages(file, uploadFileNum) {
+const s3Client = new S3Client({});
+const UPLOAD_BUCKET_NAME = "clamav-test-download";
+
+async function init(localFolderName, uploadFileNum) {
+  if (!fs.existsSync(localFolderName)) {
+    fs.mkdirSync(localFolderName);
+  }
+  await uploadImages(uploadFileNum);
+}
+
+async function uploadImages(uploadFileNum) {
+  const file = fs.readFileSync("tmp/0.png");
   for (let i = 0; i < uploadFileNum; i++) {
-    await uploadSingleImage(i + ".png", file);
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: UPLOAD_BUCKET_NAME,
+        Key: i + ".png",
+        Body: file,
+      })
+    );
   }
 }
 
-function uploadSingleImage(filename, Body) {
-  return s3Client.send(
-    new PutObjectCommand({
-      Bucket: config.uploadBucket,
-      Key: filename,
-      Body,
-    })
-  );
-}
-
-async function downloadSingleImage(key, path, info) {
-  const start = Date.now();
-  const command = new GetObjectCommand({
-    Bucket: config.uploadBucket,
-    Key: key,
-  });
-  const { Body } = await s3Client.send(command);
-
-  await writeFile(path, Body);
-  metricLog(start, {
-    ...info,
-    name: "Download Processing",
-  });
-}
-
-async function removeFromUploadBucket(key, info) {
-  const start = Date.now();
-  await s3Client.send(
-    new DeleteObjectCommand({ Bucket: config.uploadBucket, Key: key })
-  );
-  metricLog(start, {
-    ...info,
-    name: "Remove Processing",
-  });
-}
-
-function clear(numberToTest) {
-  for (let i = 0; i < numberToTest; i++) {
+function clear(localFolderName, uploadFileNum) {
+  for (let i = 0; i < uploadFileNum; i++) {
     try {
-      fs.unlinkSync(folderName + "/" + i + ".png");
+      fs.unlinkSync(localFolderName + "/" + i + ".png");
     } catch (err) {
       console.error(err);
     }
   }
 
-  fs.rmdirSync(folderName);
+  fs.rmdirSync(localFolderName);
+
+  for (let i = 0; i < uploadFileNum; i++) {
+    s3Client.send(
+      new DeleteObjectCommand({ Bucket: UPLOAD_BUCKET_NAME, Key: i + ".png" })
+    );
+  }
 }
 
-module.exports = { uploadMultipleImages, clear };
+async function downloadSingleImage(key) {
+  const command = new GetObjectCommand({
+    Bucket: UPLOAD_BUCKET_NAME,
+    Key: key,
+  });
+  const file = await s3Client.send(command);
+  return file;
+}
+
+module.exports = { init, clear, downloadSingleImage };
