@@ -33,10 +33,13 @@ const ScanClient = new NodeClam().init({
 function fileScan(path) {
   const metricKey = "file-scan-" + path;
   console.time(metricKey);
-  ScanClient.then(async (clamscan) => {
-    const { isInfected, file, viruses } = await clamscan.isInfected(path);
-    if (isInfected) console.log(`${file} is infected with ${viruses}!`);
-    console.timeEnd(metricKey);
+  return new Promise((resolve, reject) => {
+    ScanClient.then(async (clamscan) => {
+      const { isInfected, file, viruses } = await clamscan.isInfected(path);
+      if (isInfected) console.log(`${file} is infected with ${viruses}!`);
+      console.timeEnd(metricKey);
+      resolve();
+    });
   });
 }
 
