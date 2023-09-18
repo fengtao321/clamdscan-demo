@@ -23,7 +23,7 @@ function streamScan(readableStream, index) {
       // You can re-use the `clamscan` object as many times as you want
       if (isInfected) console.log("Stream is infected! Booo!");
       console.timeEnd(metricKey);
-      console.log("isInfected", isInfected);
+      return isInfected;
     });
   });
 }
