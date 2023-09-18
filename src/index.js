@@ -10,29 +10,36 @@ const start = async function () {
   await init(localFolderName, numberToTest);
   //Download from s3, write to disk, scan with clamdscan (current way), unlink file
 
+  const fileScanPromises = [];
   for (let i = 0; i < numberToTest; i++) {
-    const key = i + ".png";
-    const path = localFolderName + "/" + key;
-    const metricKey = "file-scan-" + "download-file-" + key;
-    console.time(metricKey);
-    const { Body } = await downloadSingleImage(key);
-    await writeFile(path, Body);
-    console.timeEnd(metricKey);
-    await fileScan(path);
+    fileScanPromises.push(processFileScan(i));
   }
+
+  Promise.all(fileScanPromises);
 
   //Download from s3, which gets you a stream (don’t write to disk) scan using socket
-  promises = [];
+  const streamScanPromises = [];
   for (let i = 0; i < numberToTest; i++) {
-    promises.push(processStreamScan(i));
+    streamScanPromises.push(processStreamScan(i));
   }
 
-  Promise.all(promises)
+  Promise.all(streamScanPromises)
     .then((results) => {
       console.log(results);
       clear(localFolderName, numberToTest); //remove test folder, clear s3 bucket
     })
     .catch((e) => console.log(e));
+};
+
+const processFileScan = async function (i) {
+  const key = i + ".png";
+  const path = localFolderName + "/" + key;
+  const metricKey = "file-scan-" + "download-file-" + key;
+  console.time(metricKey);
+  const { Body } = await downloadSingleImage(key);
+  await writeFile(path, Body);
+  console.timeEnd(metricKey);
+  return fileScan(path);
 };
 
 const processStreamScan = async function (i) {
