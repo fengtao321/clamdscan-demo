@@ -3,7 +3,7 @@ const { fileScan } = require("./services/filescan");
 const { streamScan } = require("./services/socketscan");
 const { writeFile } = require("fs/promises");
 
-const numberToTest = 10;
+const numberToTest = 11;
 const localFolderName = "test";
 const start = async function () {
   //upload images, create local test folder
