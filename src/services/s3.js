@@ -5,9 +5,28 @@ const {
   GetObjectCommand,
 } = require("@aws-sdk/client-s3");
 const fs = require("fs");
+const { NodeHttpHandler } = require("@aws-sdk/node-http-handler");
+const https = require("https");
+const config = require("../config");
 
-const s3Client = new S3Client({});
-const UPLOAD_BUCKET_NAME = "clamav-test-download";
+const s3Client = new S3Client({
+  // Use a custom request handler so that we can adjust the HTTPS Agent and
+  // socket behavior.
+  requestHandler: new NodeHttpHandler({
+    httpsAgent: new https.Agent({
+      maxCachedSessions: 0,
+      maxSockets: 20,
+
+      // keepAlive is a default from AWS SDK. We want to preserve this for
+      // performance reasons.
+      keepAlive: true,
+      keepAliveMsecs: 1000,
+    }),
+    socketTimeout: 5000,
+  }),
+});
+
+const UPLOAD_BUCKET_NAME = config.UPLOADBUCKET;
 
 async function init(localFolderName, uploadFileNum) {
   if (!fs.existsSync(localFolderName)) {
@@ -47,12 +66,13 @@ function clear(localFolderName, uploadFileNum) {
   }
 }
 
-function downloadSingleImage(key) {
+async function downloadSingleImage(key) {
   const command = new GetObjectCommand({
     Bucket: UPLOAD_BUCKET_NAME,
     Key: key,
   });
-  return s3Client.send(command);
+
+  return await s3Client.send(command);
 }
 
 module.exports = { init, clear, downloadSingleImage };
