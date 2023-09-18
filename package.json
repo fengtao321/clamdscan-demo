@@ -16,8 +16,7 @@
     "clamscan": "^2.1.2",
     "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
-    "stream": "^0.0.2",
-    "dotenv": "^16.3.1"
+    "stream": "^0.0.2"
   },
   "devDependencies": {
     "@aws-sdk/node-http-handler": "^3.374.0"
