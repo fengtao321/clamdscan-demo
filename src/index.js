@@ -24,21 +24,21 @@ const start = async function () {
   }
 
   console.log("====================");
-  Promise.all(streamScanPromises)
-    .then((results) => {
-      console.log(results);
-      clear(localFolderName, numberToTest); //remove test folder, clear s3 bucket
-    })
-    .catch((e) => console.log(e));
+  // Promise.all(streamScanPromises)
+  //   .then((results) => {
+  //     console.log(results);
+  //     clear(localFolderName, numberToTest); //remove test folder, clear s3 bucket
+  //   })
+  //   .catch((e) => console.log(e));
 
-  // try {
-  //   await Promise.all(streamScanPromises);
-  // } catch (e) {
-  //   console.log(e);
-  // }
+  try {
+    await Promise.all(streamScanPromises);
+  } catch (e) {
+    console.log(e);
+  }
 
-  // console.log("start to clear");
-  // clear(localFolderName, numberToTest);
+  console.log("start to clear");
+  clear(localFolderName, numberToTest);
 };
 
 const processFileScan = async function (i) {

@@ -16,16 +16,28 @@ ScanClient = new NodeClam().init({
 
 function streamScan(readableStream, index) {
   const metricKey = "stream-scan-" + index;
-  return ScanClient.then(async (clamscan) => {
-    console.time(metricKey);
-    return clamscan.scanStream(readableStream, (err, { isInfected }) => {
-      if (err) return console.error(err);
-      // You can re-use the `clamscan` object as many times as you want
-      if (isInfected) console.log("Stream is infected! Booo!");
-      console.timeEnd(metricKey);
-      return isInfected;
+  return new Promise(resolve => {
+    ScanClient.then((clamscan) => {
+      console.time(metricKey);
+      return clamscan.scanStream(readableStream, (err, { isInfected }) => {
+        if (err) return console.error(err);
+        // You can re-use the `clamscan` object as many times as you want
+        if (isInfected) console.log("Stream is infected! Booo!");
+        console.timeEnd(metricKey);
+        resolve(isInfected);
+      });
     });
   });
+  // return ScanClient.then((clamscan) => {
+  //   console.time(metricKey);
+  //   return clamscan.scanStream(readableStream, (err, { isInfected }) => {
+  //     if (err) return console.error(err);
+  //     // You can re-use the `clamscan` object as many times as you want
+  //     if (isInfected) console.log("Stream is infected! Booo!");
+  //     console.timeEnd(metricKey);
+  //     return isInfected;
+  //   });
+  // });
 }
 
 module.exports = { streamScan };
