@@ -18,7 +18,7 @@ const start = async function () {
     const { Body } = await downloadSingleImage(key);
     await writeFile(path, Body);
     console.timeEnd(metricKey);
-    fileScan(path);
+    await fileScan(path);
   }
 
   //Download from s3, which gets you a stream (don’t write to disk) scan using socket
