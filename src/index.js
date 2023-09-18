@@ -18,20 +18,30 @@ const start = async function () {
     const { Body } = await downloadSingleImage(key);
     await writeFile(path, Body);
     console.timeEnd(metricKey);
-    fileScan(path);
+    await fileScan(path);
   }
 
   //Download from s3, which gets you a stream (don’t write to disk) scan using socket
+  promises = [];
   for (let i = 0; i < numberToTest; i++) {
-    const key = i + ".png";
-    const metricKey = "stream-scan-" + "download-file-" + key;
-    console.time(metricKey);
-    const { Body } = await downloadSingleImage(key);
-    console.timeEnd(metricKey);
-    await streamScan(Body, i);
+    promises.push(processStreamScan(i));
   }
 
-  await clear(localFolderName, numberToTest); //remove test folder, clear s3 bucket
+  Promise.all(promises)
+    .then((results) => {
+      console.log(results);
+      clear(localFolderName, numberToTest); //remove test folder, clear s3 bucket
+    })
+    .catch((e) => console.log(e));
+};
+
+const processStreamScan = async function (i) {
+  const key = i + ".png";
+  const metricKey = "stream-scan-" + "download-file-" + key;
+  console.time(metricKey);
+  const { Body } = await downloadSingleImage(key);
+  console.timeEnd(metricKey);
+  return streamScan(Body, i);
 };
 
 start();

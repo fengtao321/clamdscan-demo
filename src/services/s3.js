@@ -47,13 +47,12 @@ function clear(localFolderName, uploadFileNum) {
   }
 }
 
-async function downloadSingleImage(key) {
+function downloadSingleImage(key) {
   const command = new GetObjectCommand({
     Bucket: UPLOAD_BUCKET_NAME,
     Key: key,
   });
-  const file = await s3Client.send(command);
-  return file;
+  return s3Client.send(command);
 }
 
 module.exports = { init, clear, downloadSingleImage };

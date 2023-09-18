@@ -16,13 +16,14 @@ ScanClient = new NodeClam().init({
 
 function streamScan(readableStream, index) {
   const metricKey = "stream-scan-" + index;
-  ScanClient.then(async (clamscan) => {
+  return ScanClient.then(async (clamscan) => {
     console.time(metricKey);
-    clamscan.scanStream(readableStream, (err, { isInfected }) => {
+    return clamscan.scanStream(readableStream, (err, { isInfected }) => {
       if (err) return console.error(err);
       // You can re-use the `clamscan` object as many times as you want
-      if (isInfected) return console.log("Stream is infected! Booo!");
+      if (isInfected) console.log("Stream is infected! Booo!");
       console.timeEnd(metricKey);
+      console.log("isInfected", isInfected);
     });
   });
 }
