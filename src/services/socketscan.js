@@ -1,5 +1,5 @@
 const NodeClam = require("clamscan");
-
+const config = require("../config");
 ScanClient = new NodeClam().init({
   removeInfected: false, // If true, removes infected files
   quarantineInfected: false, // False: Don't quarantine, Path: Moves files to this place.
@@ -8,8 +8,8 @@ ScanClient = new NodeClam().init({
   fileList: null, // path to file containing list of files to scan (for scanFiles method)
   scanRecursively: true, // If true, deep scan folders recursively
   clamdscan: {
-    socket: "/tmp/clamd.sock",
-    host: "127.0.0.1",
+    socket: config.CLAMDSOCKET,
+    host: config.CLAMDPORT,
     port: 3310,
   },
 });

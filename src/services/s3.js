@@ -7,6 +7,7 @@ const {
 const fs = require("fs");
 const { NodeHttpHandler } = require("@aws-sdk/node-http-handler");
 const https = require("https");
+const config = require("../config");
 
 const s3Client = new S3Client({
   // Use a custom request handler so that we can adjust the HTTPS Agent and
@@ -25,7 +26,7 @@ const s3Client = new S3Client({
   }),
 });
 
-const UPLOAD_BUCKET_NAME = "clamav-test-download";
+const UPLOAD_BUCKET_NAME = config.UPLOADBUCKET;
 
 async function init(localFolderName, uploadFileNum) {
   if (!fs.existsSync(localFolderName)) {
