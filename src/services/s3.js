@@ -36,8 +36,8 @@ async function init(localFolderName, uploadFileNum) {
 }
 
 async function uploadImages(uploadFileNum) {
-  const file = fs.readFileSync("tmp/0.png");
   for (let i = 0; i < uploadFileNum; i++) {
+    const file = fs.readFileSync(`tmp/${i}.png`);
     await s3Client.send(
       new PutObjectCommand({
         Bucket: UPLOAD_BUCKET_NAME,

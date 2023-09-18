@@ -14,30 +14,36 @@ ScanClient = new NodeClam().init({
   },
 });
 
-function streamScan(readableStream, index) {
+async function streamScan(readableStream, index) {
   const metricKey = "stream-scan-" + index;
-  return new Promise(resolve => {
-    ScanClient.then((clamscan) => {
-      console.time(metricKey);
-      return clamscan.scanStream(readableStream, (err, { isInfected }) => {
-        if (err) return console.error(err);
-        // You can re-use the `clamscan` object as many times as you want
-        if (isInfected) console.log("Stream is infected! Booo!");
-        console.timeEnd(metricKey);
-        resolve(isInfected);
-      });
-    });
-  });
-  // return ScanClient.then((clamscan) => {
-  //   console.time(metricKey);
-  //   return clamscan.scanStream(readableStream, (err, { isInfected }) => {
-  //     if (err) return console.error(err);
-  //     // You can re-use the `clamscan` object as many times as you want
-  //     if (isInfected) console.log("Stream is infected! Booo!");
-  //     console.timeEnd(metricKey);
-  //     return isInfected;
-  //   });
-  // });
+  const scanClient = await ScanClient;
+  console.log("Start stream-scan-" + index);
+  console.time(metricKey);
+  try {
+    const scanResult = await scanClient.scanStream(readableStream);
+    console.timeEnd(metricKey);
+    if (scanResult.isInfected) {
+      return console.log("Stream is infected! Booo!");
+    }
+  } catch (err) {
+    return console.error(err);
+  }
 }
+
+// function streamScan(readableStream, index) {
+//   const metricKey = "stream-scan-" + index;
+//   return new Promise((resolve) => {
+//     ScanClient.then((clamscan) => {
+//       console.time(metricKey);
+//       return clamscan.scanStream(readableStream, (err, { isInfected }) => {
+//         if (err) return console.error(err);
+//         // You can re-use the `clamscan` object as many times as you want
+//         if (isInfected) console.log("Stream is infected! Booo!");
+//         console.timeEnd(metricKey);
+//         resolve(isInfected);
+//       });
+//     });
+//   });
+// }
 
 module.exports = { streamScan };
