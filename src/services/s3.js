@@ -25,7 +25,7 @@ const s3Client = new S3Client({
   }),
 });
 
-const UPLOAD_BUCKET_NAME = "clamav-test-download";
+const UPLOAD_BUCKET_NAME = process.env.S3_BUCKET;
 
 async function init(localFolderName, uploadFileNum) {
   if (!fs.existsSync(localFolderName)) {

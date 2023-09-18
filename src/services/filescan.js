@@ -8,7 +8,7 @@ const ScanClient = new NodeClam().init({
   fileList: null, // path to file containing list of files to scan (for scanFiles method)
   scanRecursively: true, // If true, deep scan folders recursively
   clamscan: {
-    path: "/usr/local/bin/clamscan", // Path to clamscan binary on your server
+    path: process.env.CLAMSCAN_BIN, // Path to clamscan binary on your server
     db: null, // Path to a custom virus definition database
     scanArchives: true, // If true, scan archives (ex. zip, rar, tar, dmg, iso, etc...)
     active: true, // If true, this module will consider using the clamscan binary
@@ -19,7 +19,7 @@ const ScanClient = new NodeClam().init({
     port: false, // Port of host to use when connecting via TCP interface
     timeout: 60000, // Timeout for scanning files
     localFallback: true, // Use local preferred binary to scan if socket/tcp fails
-    path: "/usr/local/bin/clamdscan", // Path to the clamdscan binary on your server
+    path: process.env.CLAMDSCAN_BIN, // Path to the clamdscan binary on your server
     configFile: null, // Specify config file if it's in an unusual place
     multiscan: true, // Scan using all available cores! Yay!
     reloadDb: false, // If true, will re-load the DB on every call (slow)

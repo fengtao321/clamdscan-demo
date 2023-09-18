@@ -8,7 +8,7 @@ ScanClient = new NodeClam().init({
   fileList: null, // path to file containing list of files to scan (for scanFiles method)
   scanRecursively: true, // If true, deep scan folders recursively
   clamdscan: {
-    socket: "/tmp/clamd.sock",
+    socket: process.env.CLAMDSCAN_SOCKET,
     host: "127.0.0.1",
     port: 3310,
   },
